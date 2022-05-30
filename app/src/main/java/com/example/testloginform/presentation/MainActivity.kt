@@ -2,61 +2,56 @@ package com.example.testloginform.presentation
 
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.testloginform.R
 import com.example.testloginform.databinding.ActivityMainBinding
-import com.example.testloginform.di.DaggerAppComponent
-import com.example.testloginform.di.DataModule
 import com.example.testloginform.domain.models.UserModel
-import com.example.testloginform.domain.usecases.GetUserUseCase
-import com.example.testloginform.domain.usecases.SaveUserUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import moxy.MvpAppCompatActivity
+import moxy.presenter.InjectPresenter
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : MvpAppCompatActivity(), MainView {
 
     private lateinit var binding: ActivityMainBinding
 
-    @Inject
-    lateinit var getUser: GetUserUseCase
+    @InjectPresenter
+    lateinit var mPresenter: MainPresenter
 
-    @Inject
-    lateinit var saveUser: SaveUserUseCase
-
-    private val component by lazy {
-        DaggerAppComponent.builder()
-            .dataModule(DataModule(this))
-            .build()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
 
         binding.btGetData.setOnClickListener {
-            lifecycleScope.launch {
-                loading()
-                val user = getUser.getUser()
-                binding.tvGetData.text =
-                    getString(R.string.get_user, user.firstName, user.lastName)
-            }
+            getUser()
         }
 
         binding.btSaveData.setOnClickListener {
-            lifecycleScope.launch {
-                loading()
-                val firstName = binding.etFirstName.text.toString()
-                val lastName = binding.etLastName.text.toString()
-                val user = UserModel(firstName, lastName)
-                saveUser.saveUser(user)
-            }
+            saveUser()
+        }
+    }
+
+    override fun getUser() {
+        lifecycleScope.launch {
+            loading()
+            val user = mPresenter.repository.getData()
+            binding.tvGetData.text =
+                getString(R.string.get_user, user.firstName, user.lastName)
+        }
+    }
+
+    override fun saveUser() {
+        lifecycleScope.launch {
+            loading()
+            val firstName = binding.etFirstName.text.toString()
+            val lastName = binding.etLastName.text.toString()
+            val user = UserModel(firstName, lastName)
+            mPresenter.repository.saveData(user)
         }
     }
 
