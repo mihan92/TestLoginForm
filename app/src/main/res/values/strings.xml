@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Test LoginForm</string>
+    <string name="hint_get_data">Data</string>
+    <string name="bt_get_data">get data</string>
+    <string name="hint_first_name">First Name</string>
+    <string name="hint_last_name">Last Name</string>
+    <string name="bt_save_data">Save data</string>
+    <string name="error_message">Заполните все поля</string>
+    <string name="success_message">Данные сохранены успешно</string>
+    <string name="get_user">%s %s</string>
+</resources>
